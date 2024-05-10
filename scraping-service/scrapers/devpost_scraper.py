@@ -1,4 +1,6 @@
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -8,7 +10,8 @@ from selenium.webdriver.support import expected_conditions as EC
 options = Options()
 options.headless = True
 options.add_argument("--window-size=1920,1200")
-driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome(options=options, service=ChromeService(ChromeDriverManager().install()))
+driver.get("https://www.google.com")
 
 def scroll_to_bottom(driver):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -17,7 +20,7 @@ def scroll_to_top(driver):
     driver.execute_script("window.scrollTo(0, 0);")
 
 # devpost: for long hackathons, publicise at least a month before deadline
-url = "https://devpost.com/hackathons?challenge_type[]=online&status[]=upcoming&status[]=open"
+url = "https://devpost.com/hackathons?challenge_type[]=online&open_to[]=public&status[]=upcoming&status[]=open"
 driver.get(url)
 target_found = False
 
@@ -61,11 +64,16 @@ for i, link in enumerate(links):
     end_td = start_td.find_element(By.XPATH, "./following-sibling::td")
     end_dates.append(end_td.get_attribute("data-iso-date"))
 
+count = 0
+
 for title, location, start_date, end_date, link in zip(titles, locations, start_dates, end_dates, links):
-    print(title)
-    print(location)
-    print(start_date)
-    print(end_date)
-    print(link)
-    
+    print(f'Name: {title}')
+    print(f'Location: {location}')
+    print(f'Start: {start_date}')
+    print(f'End: {end_date}')
+    print(f'Link: {link}')  
+    count += 1
+
+print(f'{count} events found.')
+
 driver.quit()
