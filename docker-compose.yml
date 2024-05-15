@@ -1,26 +1,29 @@
-version: '3.8'
+version: '3.9'
 
 services:
   event-service:
     container_name: event-service
     build:
       context: ./event-service
-    environment:
-      DATABASE_URL: mongodb://mongo-db:27017/events
-      SECRET_KEY: ${SECRET_KEY}
     ports: 
       - 5000:5000
+    env_file:
+      - .env
     depends_on:
-      - mongo-db
+      - postgres-db
   
-  mongo-db:
-    container_name: mongo-db
-    image: mongo:latest
+  postgres-db:
+    container_name: postgres-db
+    image: postgres:15.4
     restart: always
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - mongo-db:/data/db
+      - postgres-db:/var/lib/postgresql/data
     ports:
-      - 27017:27017
+      - ${DB_PORT}:${DB_PORT}
 
 volumes:
-  mongo-db
+  postgres-db:
